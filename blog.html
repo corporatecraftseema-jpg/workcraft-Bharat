@@ -2,24 +2,45 @@
 <html>
 <head>
     <title>WorkCraft Bharat - Blog</title>
+    <style>
+        body { font-family: Arial; margin: 40px; }
+        .post { border-bottom: 1px solid #ccc; padding: 20px 0; }
+        .post h2 { margin-bottom: 5px; }
+    </style>
 </head>
 <body>
-    <h1>WorkCraft Bharat Blog</h1>
-    <div id="posts"></div>
 
-    <script>
-        fetch('https://api.github.com/repos/corporatecraftseema-jpg/workcraft-Bharat/contents/_posts')
-            .then(response => response.json())
-            .then(data => {
-                let postsDiv = document.getElementById("posts");
-                data.forEach(file => {
-                    let link = document.createElement("a");
-                    link.href = file.download_url;
-                    link.innerText = file.name;
-                    postsDiv.appendChild(link);
-                    postsDiv.appendChild(document.createElement("br"));
-                });
-            });
-    </script>
+<h1>WorkCraft Bharat Blog</h1>
+<div id="posts"></div>
+
+<script>
+fetch('https://api.github.com/repos/corporatecraftseema-jpg/workcraft-Bharat/contents/_posts')
+.then(response => response.json())
+.then(files => {
+    let postsDiv = document.getElementById("posts");
+
+    files.forEach(file => {
+        fetch(file.download_url)
+        .then(res => res.text())
+        .then(content => {
+            let postDiv = document.createElement("div");
+            postDiv.className = "post";
+
+            let titleMatch = content.match(/title:\s*"(.+)"/);
+            let title = titleMatch ? titleMatch[1] : file.name;
+
+            let body = content.split('---')[2];
+
+            postDiv.innerHTML = `
+                <h2>${title}</h2>
+                <p>${body}</p>
+            `;
+
+            postsDiv.appendChild(postDiv);
+        });
+    });
+});
+</script>
+
 </body>
 </html>
